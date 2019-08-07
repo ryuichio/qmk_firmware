@@ -64,37 +64,37 @@ enum macro_keycodes {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,  BSPC,\
+        ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,  MINS,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      CTLTB,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,  QUOT,\
+      CTLTB,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,   ENT,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH,  RSFT,\
+       LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH,  QUOT,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
+                                  GUIEI, LOWER,   SPC,     BSPC, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
   [_LOWER] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        ESC,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  BSPC,\
+        TAB,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  BSPC,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      CTLTB,    F1,    F2,    F3,    F4,    F5,                     F6,    F7,    F8,    F9,   F10, XXXXX,\
+       LCTL,    F1,    F2,    F3,    F4,    F5,                   LEFT,  DOWN,    UP, RIGHT, XXXXX,   ENT,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       LSFT,   F11,   F12,   F13,   F14,   F15,                    F16,   F17,   F18,   F19,   F20, XXXXX,\
+       LSFT,    F6,    F7,    F8,    F9,   F10,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
+                                  GUIEI, LOWER,   SPC,     BSPC, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
   [_RAISE] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        ESC,  EXLM,    AT,  HASH,   DLR,  PERC,                   CIRC,  AMPR,  ASTR,  LPRN,  RPRN,  BSPC,\
+        TAB,  EXLM,    AT,  HASH,   DLR,  PERC,                   CIRC,  AMPR,  ASTR,  LPRN,  RPRN,  BSPC,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      CTLTB, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                   MINS,   EQL,  LCBR,  RCBR,  PIPE,   GRV,\
+       LCTL, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                   MINS,   EQL,  LCBR,  RCBR,  PIPE,   GRV,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                   UNDS,  PLUS,  LBRC,  RBRC,  BSLS,  TILD,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  GUIEI, LOWER,   SPC,      ENT, RAISE, ALTKN \
+                                  GUIEI, LOWER,   SPC,     BSPC, RAISE, ALTKN \
                               //`--------------------'  `--------------------'
   ),
 
