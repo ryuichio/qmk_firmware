@@ -231,7 +231,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         raise_pressed = false;
       }
       update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
-        break;
+      break;
     case KANJI:
       if (record->event.pressed) {
         if (keymap_config.swap_lalt_lgui == false) {
