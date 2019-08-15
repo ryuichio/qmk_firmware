@@ -86,15 +86,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_RAISE] = LAYOUT_base( \
   //,--------------------------------------------------------------------------------------------------------------------.
-        _____,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   XXXXX,   XXXXX,   XXXXX, KC_LBRC, KC_RBRC,            XXXXX,\
+        _____,   KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,           KC_F12,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+-----------------|
-      KC_TBSF,   KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,            _____,\
+      KC_TBSF,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX, KC_LBRC, KC_RBRC,            _____,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____,  KC_F11,  KC_F12,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX, KC_PGUP,         \
+        _____,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX,   XXXXX, KC_PGUP,         \
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
         _____,   _____,   _____,   _____,            _____,           KC_DEL,   _____,   XXXXX, KC_HOME, KC_PGDN,  KC_END,\
   //`-------------------------------------------------------------------------------------------------------------------'
-      XXXXX \
+      KC_F11 \
   // ExtraKey: Split backspace key or it is below the enter key.
   ),
 
