@@ -229,6 +229,35 @@ void iota_gfx_task_user(void) {
 
 static bool lower_pressed = false;
 static bool raise_pressed = false;
+static uint16_t lower_pressed_time = 0;
+static uint16_t raise_pressed_time = 0;
+
+static inline void set_lower_pressed(uint16_t time) {
+  lower_pressed = true;
+  raise_pressed = false;
+  lower_pressed_time = time;
+}
+
+static inline void set_raise_pressed(uint16_t time) {
+  raise_pressed = true;
+  lower_pressed = false;
+  raise_pressed_time = time;
+}
+
+static inline void reset_layer_pressed(void) {
+  lower_pressed = false;
+  raise_pressed = false;
+  lower_pressed_time = 0;
+  raise_pressed_time = 0;
+}
+
+static inline bool is_lower_pressed(uint16_t time) {
+  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_TERM);
+}
+
+static inline bool is_raise_pressed(uint16_t time) {
+  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_TERM);
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
@@ -250,10 +279,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case LOWER:
       if (record->event.pressed) {
-        lower_pressed = true;
-        raise_pressed = false;
+        set_lower_pressed(record->event.time);
       } else {
-        if (lower_pressed) {
+        if (is_lower_pressed(record->event.time)) {
             _change_ime(false);
         }
         lower_pressed = false;
@@ -263,10 +291,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case RAISE:
       if (record->event.pressed) {
-        raise_pressed = true;
-        lower_pressed = false;
+        set_raise_pressed(record->event.time);
       } else {
-        if (raise_pressed) {
+        if (is_raise_pressed(record->event.time)) {
             _change_ime(true);
         }
         raise_pressed = false;
@@ -309,8 +336,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     default:
       if (record->event.pressed) {
-        lower_pressed = false;
-        raise_pressed = false;
+        reset_layer_pressed();
       }
       break;
   }
