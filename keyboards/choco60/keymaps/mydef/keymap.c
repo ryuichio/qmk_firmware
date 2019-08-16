@@ -27,13 +27,17 @@ enum layer_names {
 
 #define KC_FN MO(_FN)
 
-#define MAC
+//#define MAC
 #ifdef MAC
 #define SP_IME_ON   KC_LANG1
 #define SP_IME_OFF  KC_LANG2
+#define SP_CTRL     KC_LGUI
+#define SP_GUI      KC_LCTRL
 #else
 #define SP_IME_ON   KC_HENK
 #define SP_IME_OFF  KC_MHEN
+#define SP_CTRL     KC_LCTRL
+#define SP_GUI      KC_LGUI
 #endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
