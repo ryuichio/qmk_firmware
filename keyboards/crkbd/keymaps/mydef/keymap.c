@@ -93,7 +93,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLBS,   GRV,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   ALT,      GUI,  BSPC, RAISE\
+                                    ALT, LOWER,   SPC,     BSPC, RAISE,   GUI\
                               //`--------------------'  `--------------------'
   ),
 
@@ -105,7 +105,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX,  LBRC,  RBRC, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   ALT,      GUI,  BSPC, RAISE\
+                                    ALT, LOWER,   SPC,     BSPC, RAISE,   GUI\
                               //`--------------------'  `--------------------'
   ),
 
@@ -117,7 +117,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,   F11,   F12, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   ALT,      GUI,   DEL, RAISE\
+                                    ALT, LOWER,   SPC,      DEL, RAISE,   GUI\
                               //`--------------------'  `--------------------'
   ),
 
@@ -129,7 +129,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LMOD,  LHUD,  LSAD,  LVAD, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   ALT,      GUI,  BSPC, RAISE\
+                                    ALT, LOWER,   SPC,     BSPC, RAISE,   GUI\
                               //`--------------------'  `--------------------'
   )
 };
