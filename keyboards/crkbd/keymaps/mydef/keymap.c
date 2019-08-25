@@ -47,11 +47,17 @@ enum macro_keycodes {
 
 //#define MAC
 #ifdef MAC
+#define SP_IS_MAC   true
 #define SP_IME_ON   KC_LANG1
 #define SP_IME_OFF  KC_LANG2
+#define SP_CMD      KC_LGUI
+#define SP_CTRL     KC_LCTL
 #else
+#define SP_IS_MAC   false
 #define SP_IME_ON   KC_HENK
 #define SP_IME_OFF  KC_MHEN
+#define SP_CMD      KC_LCTL
+#define SP_CTRL     KC_LGUI
 #endif
 
 #define KC______ KC_TRNS
@@ -90,7 +96,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
   [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
   [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
-  [TD_CTTB] = ACTION_TAP_DANCE_DOUBLE(KC_LCTL, KC_TAB),
+  [TD_CTTB] = ACTION_TAP_DANCE_DOUBLE(SP_CMD,  KC_TAB),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -132,7 +138,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_ADJUST] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        RST,  LRST, XXXXX,  NORM,  SWAP, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
+        RST,  LRST, XXXXX,  NORM, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LTOG,  LHUI,  LSAI,  LVAI, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
@@ -161,18 +167,10 @@ static inline void _send_key(uint16_t keycode) {
 }
 
 static inline void _change_ime(bool enable) {
-    if (keymap_config.swap_lalt_lgui == false) {  // mac
-        if (enable) {
-            _send_key(KC_LANG1);
-        } else {
-            _send_key(KC_LANG2);
-        }
-    } else {  // win
-        if (enable) {
-            _send_key(KC_HENK);
-        } else {
-            _send_key(KC_MHEN);
-        }
+    if (enable) {
+        _send_key(SP_IME_ON);
+    } else {
+        _send_key(SP_IME_OFF);
     }
 }
 
@@ -209,7 +207,7 @@ void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     // If you want to change the display of OLED, you need to change here
     matrix_write_ln(matrix, " ");
-    matrix_write(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
+    matrix_write(matrix, read_mode_icon(!SP_IS_MAC));
     matrix_write_ln(matrix, read_layer_state());
     matrix_write_ln(matrix, read_keylog());
     matrix_write(matrix, read_keylogs());
@@ -315,9 +313,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case KC_GUI:
       if (record->event.pressed) {
-        register_code(KC_LGUI);
+        register_code(SP_CTRL);
       } else {
-        unregister_code(KC_LGUI);
+        unregister_code(SP_CTRL);
       }
       break;
     case RGB_MOD:
