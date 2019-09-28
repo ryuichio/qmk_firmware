@@ -46,13 +46,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    /**/ KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRACKET, KC_RBRACKET, KC_BSLASH,
     KC_LCTRL,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    /**/ KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOTE,    KC_ENTER,
     KC_LSHIFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    /**/ KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSHIFT,   KC_FN,
-               KC_LGUI, KC_LALT, KC_SPACE,                  /**/ KC_FN,   KC_BSPC, SP_IME_OFF, SP_IME_ON
+               KC_LGUI, KC_LALT, KC_SPACE,                  /**/ KC_BSPC, KC_FN,   SP_IME_OFF, SP_IME_ON
   ),
   [_FN] = LAYOUT(
     RESET,     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   /**/ KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,    KC_F12,  KC_INSERT, KC_DEL,
     _______,   KC_PSCR, KC_SLCK, KC_PAUS, _______, _______, /**/ _______, KC_PGUP, KC_UP,   KC_PGDN, _______, _______,   _______, _______,
     _______,   _______, _______, _______, _______, _______, /**/ KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT, KC_END,  _______,   KC_ENTER,
     _______,   _______, _______, _______, _______, _______, /**/ _______, _______, _______, _______, _______, KC_RSHIFT, KC_FN,
-               _______, _______, _______,                   /**/ _______, KC_DEL,  _______, _______
+               _______, _______, _______,                   /**/ KC_DEL,  _______, _______, _______
   )
 };
