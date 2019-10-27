@@ -15,5 +15,6 @@
  */
 
 #pragma once
+#define MASTER_RIGHT
 
 // place overrides here
