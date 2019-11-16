@@ -18,3 +18,5 @@
 #define MASTER_RIGHT
 
 // place overrides here
+#define TAPPING_FORCE_HOLD
+#define TAPPING_TERM 180
