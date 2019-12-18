@@ -19,10 +19,16 @@
 //
 // make choco60:mydef:avrdude
 //
+#define TAPPING_TERM 180
 
 enum layer_names {
     _BASE,
     _FN,
+};
+
+enum custom_keycodes {
+  LOWER = SAFE_RANGE,
+  RAISE,
 };
 
 #define KC_FN MO(_FN)
@@ -32,12 +38,14 @@ enum layer_names {
 #define SP_IME_ON   KC_LANG1
 #define SP_IME_OFF  KC_LANG2
 #define SP_CTRL     KC_LGUI
-#define SP_GUI      KC_LCTRL
+#define SP_LGUI     KC_LCTRL
+#define SP_RGUI     KC_RCTRL
 #else
 #define SP_IME_ON   KC_HENK
 #define SP_IME_OFF  KC_MHEN
 #define SP_CTRL     KC_LCTRL
-#define SP_GUI      KC_LGUI
+#define SP_LGUI     KC_LGUI
+#define SP_RGUI     KC_RGUI
 #endif
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -46,7 +54,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    /**/ KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRACKET, KC_RBRACKET, KC_BSLASH,
     SP_CTRL,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    /**/ KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOTE,    KC_ENTER,
     KC_LSHIFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    /**/ KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSHIFT,   KC_FN,
-               SP_GUI,  KC_LALT, KC_SPACE,                  /**/ KC_BSPC, KC_FN,   SP_IME_OFF, SP_IME_ON
+               KC_LALT, LOWER,   KC_SPACE,                  /**/ KC_BSPC, KC_FN,   RAISE,   SP_LGUI
   ),
   [_FN] = LAYOUT(
     RESET,     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   /**/ KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,    KC_F12,  KC_INSERT, KC_DEL,
@@ -56,3 +64,69 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                _______, _______, _______,                   /**/ KC_DEL,  _______, _______, _______
   )
 };
+
+static bool lower_pressed = false;
+static bool raise_pressed = false;
+static uint16_t lower_pressed_time = 0;
+static uint16_t raise_pressed_time = 0;
+
+static inline void _send_key(uint16_t keycode) {
+    register_code(keycode);
+    unregister_code(keycode);
+}
+
+static inline void _change_ime(bool enable) {
+    if (enable) {
+        _send_key(SP_IME_ON);
+    } else {
+        _send_key(SP_IME_OFF);
+    }
+}
+
+static inline bool is_lower_pressed(uint16_t time) {
+  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_TERM);
+}
+
+static inline bool is_raise_pressed(uint16_t time) {
+  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_TERM);
+}
+
+static inline void set_lower_pressed(uint16_t time) {
+  lower_pressed = true;
+  raise_pressed = false;
+  lower_pressed_time = time;
+}
+
+static inline void set_raise_pressed(uint16_t time) {
+  raise_pressed = true;
+  lower_pressed = false;
+  raise_pressed_time = time;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case LOWER:
+      if (record->event.pressed) {
+        set_lower_pressed(record->event.time);
+      } else {
+        if (is_lower_pressed(record->event.time)) {
+            _change_ime(false);
+        }
+        lower_pressed = false;
+      }
+      return false;
+      break;
+    case RAISE:
+      if (record->event.pressed) {
+        set_raise_pressed(record->event.time);
+      } else {
+        if (is_raise_pressed(record->event.time)) {
+            _change_ime(true);
+        }
+        raise_pressed = false;
+      }
+      return false;
+      break;
+  }
+  return true;
+}
