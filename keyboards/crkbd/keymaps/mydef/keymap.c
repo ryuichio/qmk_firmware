@@ -45,20 +45,7 @@ enum macro_keycodes {
   KC_SAMPLEMACRO,
 };
 
-//#define MAC
-#ifdef MAC
-#define SP_IS_MAC   true
-#define SP_IME_ON   KC_LANG1
-#define SP_IME_OFF  KC_LANG2
-#define SP_CMD      KC_LGUI
-#define SP_CTRL     KC_LCTL
-#else
-#define SP_IS_MAC   false
-#define SP_IME_ON   KC_HENK
-#define SP_IME_OFF  KC_MHEN
-#define SP_CMD      KC_LCTL
-#define SP_CTRL     KC_LGUI
-#endif
+#define _IS_MAC   (keymap_config.swap_lalt_lgui == false)
 
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
@@ -92,11 +79,66 @@ enum tapdances{
 #define KC_MIEQ  TD(TD_MIEQ)
 #define KC_CTTB  TD(TD_CTTB)
 
+static inline void _send_ctrl_by_mode(bool to_register) {
+  if (to_register) {
+    if (_IS_MAC) {
+        register_code (KC_LGUI);
+    } else {
+        register_code (KC_LCTL);
+    }
+  } else {
+    if (_IS_MAC) {
+        unregister_code (KC_LGUI);
+    } else {
+        unregister_code (KC_LCTL);
+    }
+  }
+}
+
+static inline void _send_win_by_mode(bool to_register) {
+  if (to_register) {
+    if (_IS_MAC) {
+        register_code (KC_LCTL);
+    } else {
+        register_code (KC_LGUI);
+    }
+  } else {
+    if (_IS_MAC) {
+        unregister_code (KC_LCTL);
+    } else {
+        unregister_code (KC_LGUI);
+    }
+  }
+}
+
+void dance_cln_finished (qk_tap_dance_state_t *state, void *user_data) {
+  switch (state->keycode) {
+    case KC_CTTB:
+      if (state->count == 1) {
+        _send_ctrl_by_mode(true);
+      } else if (state->count == 2) {
+        register_code(KC_TAB);
+      }
+      break;
+  }
+}
+void dance_cln_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (state->keycode) {
+    case KC_CTTB:
+      if (state->count == 1) {
+        _send_ctrl_by_mode(false);
+      } else if (state->count == 2) {
+        unregister_code(KC_TAB);
+      }
+      break;
+  }
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
   [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
   [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
-  [TD_CTTB] = ACTION_TAP_DANCE_DOUBLE(SP_CMD,  KC_TAB),
+  [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -108,7 +150,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLBS,   GRV,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                    GUI, LOWER,   SPC,     BSPC, RAISE,   ALT\
+                                  LOWER,   SPC,   GUI,      ALT,  BSPC, RAISE\
                               //`--------------------'  `--------------------'
   ),
 
@@ -120,7 +162,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX,  LBRC,  RBRC, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                    GUI, LOWER,   SPC,     BSPC, RAISE,   ALT\
+                                  LOWER,   SPC,   GUI,      ALT,  BSPC, RAISE\
                               //`--------------------'  `--------------------'
   ),
 
@@ -132,19 +174,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,   F11,   F12, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                    GUI, LOWER,   SPC,      DEL, RAISE,   ALT\
+                                  LOWER,   SPC,   GUI,      ALT,  BSPC, RAISE\
                               //`--------------------'  `--------------------'
   ),
 
   [_ADJUST] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        RST,  LRST, XXXXX,  NORM, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
+        RST,  LRST, XXXXX,  NORM,  SWAP, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LTOG,  LHUI,  LSAI,  LVAI, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LMOD,  LHUD,  LSAD,  LVAD, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                    GUI, LOWER,   SPC,     BSPC, RAISE,   ALT\
+                                  LOWER,   SPC,   GUI,      ALT,  BSPC, RAISE\
                               //`--------------------'  `--------------------'
   )
 };
@@ -168,9 +210,17 @@ static inline void _send_key(uint16_t keycode) {
 
 static inline void _change_ime(bool enable) {
     if (enable) {
-        _send_key(SP_IME_ON);
+      if (_IS_MAC) {
+        _send_key(KC_LANG1);
+      } else {
+        _send_key(KC_HENK);
+      }
     } else {
-        _send_key(SP_IME_OFF);
+      if (_IS_MAC) {
+        _send_key(KC_LANG2);
+      } else {
+        _send_key(KC_MHEN);
+      }
     }
 }
 
@@ -207,7 +257,7 @@ void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     // If you want to change the display of OLED, you need to change here
     matrix_write_ln(matrix, " ");
-    matrix_write(matrix, read_mode_icon(!SP_IS_MAC));
+    matrix_write(matrix, read_mode_icon(!_IS_MAC));
     matrix_write_ln(matrix, read_layer_state());
     matrix_write_ln(matrix, read_keylog());
     matrix_write(matrix, read_keylogs());
@@ -313,9 +363,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case KC_GUI:
       if (record->event.pressed) {
-        register_code(SP_CTRL);
+        _send_win_by_mode(true);
       } else {
-        unregister_code(SP_CTRL);
+        _send_win_by_mode(false);
       }
       break;
     case RGB_MOD:
