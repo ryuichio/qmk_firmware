@@ -156,25 +156,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_LOWER] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        ESC,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  MIEQ,\
+      _____,     1,     2,     3,     4,     5,                      6,     7,     8,     9,     0,  MIEQ,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       CTTB,  EXLM,    AT,  HASH,   DLR,  PERC,                   CIRC,  AMPR,  ASTR,  LPRN,  RPRN,   ENT,\
+        TAB,  EXLM,    AT,  HASH,   DLR,  PERC,                   CIRC,  AMPR,  ASTR,  LPRN,  RPRN, _____,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX,  LBRC,  RBRC, XXXXX,\
+      _____, XXXXX, XXXXX, XXXXX,  LCBR,  LBRC,                   RBRC,  RCBR, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   GUI,      ALT,   DEL, RAISE\
+                                  _____, _____, _____,    _____,   DEL, _____\
                               //`--------------------'  `--------------------'
   ),
 
   [_RAISE] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
-        ESC,    F1,    F2,    F3,    F4,    F5,                  XXXXX,  PGUP,    UP,  PGDN, XXXXX, XXXXX,\
+      _____,    F1,    F2,    F3,    F4,    F5,                  XXXXX,  PGUP,    UP,  PGDN, XXXXX, XXXXX,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       CTTB,    F6,    F7,    F8,    F9,   F10,                   HOME,  LEFT,  DOWN, RIGHT,   END,   ENT,\
+        TAB,    F6,    F7,    F8,    F9,   F10,                   HOME,  LEFT,  DOWN, RIGHT,   END, _____,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       LSFT,   F11,   F12, XXXXX, XXXXX, XXXXX,                  XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
+      _____,   F11,   F12, XXXXX,  LCBR,  LBRC,                   RBRC,  RCBR, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   GUI,      ALT,   DEL, RAISE\
+                                  _____, _____, _____,    _____,   DEL, _____\
                               //`--------------------'  `--------------------'
   ),
 
