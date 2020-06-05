@@ -57,8 +57,10 @@ enum tapdances{
 #define KC_X_AL  LALT_T(KC_X)
 #ifdef _MAC
 #define KC_C_GU  LCTL_T(KC_C)
+#define KC_V_GU  LCTL_T(KC_V)
 #else
 #define KC_C_GU  LGUI_T(KC_C)
+#define KC_V_GU  LGUI_T(KC_V)
 #endif
 #define KC_SSSF  RSFT_T(KC_SLSH)
 #ifdef _MAC
@@ -97,7 +99,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
        KC_A_CT,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,  KC_ENCT,
   //|---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
-       KC_Z_SF,  KC_X_AL,  KC_C_GU,     KC_V,     KC_B,     KC_N,     KC_M,  KC_COMM,   KC_DOT,  KC_SSSF,
+       KC_Z_SF,  KC_X_AL,     KC_C,  KC_V_GU,     KC_B,     KC_N,     KC_M,  KC_COMM,   KC_DOT,  KC_SSSF,
   //`---------+---------+---------+---------+---------+---------+---------+---------+---------+---------'
                                                KC_SPLO,  KC_BSRA
   //                                        `---------|---------'
@@ -121,7 +123,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
        KC_F6CT,    KC_F7,    KC_F8,    KC_F9,   KC_F10,  KC_HOME,  KC_LEFT,  KC_DOWN,  KC_RGHT,   KC_END,
   //|---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
-       KC_11SF,  KC_12AL,  MY_LGUI,  XXXXXXX,  IME_OFF,   IME_ON,    KC_RO,  KC_COMM,   KC_DOT,  KC_SSSF,
+       KC_11SF,  KC_12AL,  XXXXXXX,  MY_LGUI,  IME_OFF,   IME_ON,    KC_RO,  KC_COMM,   KC_DOT,  KC_SSSF,
   //`---------+---------+---------+---------+---------+---------+---------+---------+---------+---------'
                                                _______,  _______
   //                                        `---------|---------'
