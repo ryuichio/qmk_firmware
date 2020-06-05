@@ -1,6 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "keymap_jp.h"
 
+//
+// make treadstone32/lite:mydef:avrdude
+//
 #define _MAC
 
 #ifdef RGBLIGHT_ENABLE
