@@ -7,6 +7,7 @@
 #ifdef SSD1306OLED
   #include "ssd1306.h"
 #endif
+#define TAPPING_LAYER_TERM 150 // Custom LT Tapping term
 
 //
 // make crkbd:mydef:avrdude
@@ -38,7 +39,9 @@ enum custom_keycodes {
   BACKLIT,
   RGBRST,
   SP_GUI,
-  SP_ALT
+  SP_ALT,
+  SP_SPC,
+  SP_BS,
 };
 
 enum macro_keycodes {
@@ -66,6 +69,8 @@ enum macro_keycodes {
 #define KC_SWAP  AG_SWAP
 #define KC_GUI   SP_GUI
 #define KC_ALT   SP_ALT
+#define KC_SSPC  SP_SPC
+#define KC_SBS   SP_BS
 
 enum tapdances{
   TD_SCCL = 0,
@@ -78,8 +83,8 @@ enum tapdances{
 #define KC_MLAD  MO(_ADJUST)
 
 // Layer taps
-#define KC_SPLO  LT(_LOWER, KC_SPC)
-#define KC_BSRA  LT(_RAISE, KC_BSPC)
+// #define KC_SPLO  LT(_LOWER, KC_SPC)
+// #define KC_BSRA  LT(_RAISE, KC_BSPC)
 
 // Tap dances
 #define KC_SCCL  TD(TD_SCCL)
@@ -158,7 +163,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLBS,   GRV,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  IMEOF,  SPLO,   ALT,      GUI,  BSRA, IMEON\
+                                  IMEOF,  SSPC,   ALT,      GUI,   SBS, IMEON\
                               //`--------------------'  `--------------------'
   ),
 
@@ -182,7 +187,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       _____,   F11,   F12, XXXXX,  LCBR,  LBRC,                   RBRC,  RCBR, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  _____,  MLAD, _____,    _____,  _____, _____\
+                                  _____, _____, _____,    _____,  _____, _____\
                               //`--------------------'  `--------------------'
   ),
 
@@ -316,11 +321,11 @@ static inline void reset_layer_pressed(void) {
 }
 
 static inline bool is_lower_pressed(uint16_t time) {
-  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_TERM);
+  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_LAYER_TERM);
 }
 
 static inline bool is_raise_pressed(uint16_t time) {
-  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_TERM);
+  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_LAYER_TERM);
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -340,22 +345,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case IMEOFF:
       if (record->event.pressed) {
+        _change_ime(false);
+      }
+      return false;
+      break;
+    case IMEON:
+      if (record->event.pressed) {
+        _change_ime(true);
+      }
+      return false;
+      break;
+    case SP_SPC:
+      if (record->event.pressed) {
         set_lower_pressed(record->event.time);
       } else {
         if (is_lower_pressed(record->event.time)) {
-            _change_ime(false);
+          _send_key(KC_SPC);
         }
         lower_pressed = false;
       }
       update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
       return false;
       break;
-    case IMEON:
+    case SP_BS:
       if (record->event.pressed) {
         set_raise_pressed(record->event.time);
       } else {
         if (is_raise_pressed(record->event.time)) {
-            _change_ime(true);
+          _send_key(KC_BSPC);
         }
         raise_pressed = false;
       }
