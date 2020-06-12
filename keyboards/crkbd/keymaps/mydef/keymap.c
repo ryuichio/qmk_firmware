@@ -32,8 +32,8 @@ extern uint8_t is_master;
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
-  LOWER,
-  RAISE,
+  IMEOFF,
+  IMEON,
   ADJUST,
   BACKLIT,
   RGBRST,
@@ -49,8 +49,8 @@ enum macro_keycodes {
 
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
-#define KC_LOWER LOWER
-#define KC_RAISE RAISE
+#define KC_IMEOF IMEOFF
+#define KC_IMEON IMEON
 #define KC_RST   RESET
 #define KC_LRST  RGBRST
 #define KC_LTOG  RGB_TOG
@@ -74,6 +74,14 @@ enum tapdances{
   TD_CTTB,
 };
 
+// Layer Mode aliases
+#define KC_MLAD  MO(_ADJUST)
+
+// Layer taps
+#define KC_SPLO  LT(_LOWER, KC_SPC)
+#define KC_BSRA  LT(_RAISE, KC_BSPC)
+
+// Tap dances
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
 #define KC_MIEQ  TD(TD_MIEQ)
@@ -150,7 +158,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLBS,   GRV,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LOWER,   SPC,   ALT,      GUI,  BSPC, RAISE\
+                                  IMEOF,  SPLO,   ALT,      GUI,  BSRA, IMEON\
                               //`--------------------'  `--------------------'
   ),
 
@@ -174,7 +182,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       _____,   F11,   F12, XXXXX,  LCBR,  LBRC,                   RBRC,  RCBR, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  _____, _____, _____,    _____,   DEL, _____\
+                                  _____,  MLAD, _____,    _____,  _____, _____\
                               //`--------------------'  `--------------------'
   ),
 
@@ -330,7 +338,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
-    case LOWER:
+    case IMEOFF:
       if (record->event.pressed) {
         set_lower_pressed(record->event.time);
       } else {
@@ -342,7 +350,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
       return false;
       break;
-    case RAISE:
+    case IMEON:
       if (record->event.pressed) {
         set_raise_pressed(record->event.time);
       } else {

@@ -30,34 +30,34 @@ enum slamd_layouts {
 enum custom_keycodes {
   LOWER = SAFE_RANGE,
   RAISE,
-  ADJUST,
+  KC_IMEOF,
+  KC_IMEON,
+  KC_WIN,
+  KC_CTL,
+  KC_ALT,
 };
 
 enum tapdances{
   TD_SCCL = 0,
   TD_SLBS,
   TD_MIEQ,
+  TD_CTTB,
 };
 
 #define XXXXXXX  KC_NO
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
 #define KC_MIEQ  TD(TD_MIEQ)
+#define KC_CTTB  TD(TD_CTTB)
 
-#define _MAC
-#ifdef _MAC
-#define SP_CTRL  KC_LGUI
-#define SP_WIN   KC_LCTL
-#else
-#define SP_CTRL  KC_LCTL
-#define SP_WIN   KC_LGUI
-#endif
+#define _IS_MAC   (keymap_config.swap_lalt_lgui == false)
 
-qk_tap_dance_action_t tap_dance_actions[] = {
-  [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
-  [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
-  [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
-};
+// Layer Mode aliases
+#define KC_MLAD  MO(_ADJUST)
+
+// Layer taps
+#define KC_SPLO  LT(_LOWER, KC_SPC)
+#define KC_BSRA  LT(_RAISE, KC_BSPC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /* Qwerty
@@ -73,14 +73,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_BASE] = LAYOUT(
     KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_MIEQ,
-    SP_CTRL, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCCL, KC_ENT,
+    KC_CTTB, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCCL, KC_ENT,
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_BSLS,
-    KC_TAB,  KC_LCTL, KC_LALT, SP_WIN,  LOWER,   KC_SPC,  KC_BSPC, RAISE,   KC_RALT, KC_LBRC, KC_RBRC, KC_GRV
+    KC_TAB,  KC_LCTL, KC_ALT,  KC_WIN,  KC_IMEOF,KC_SPLO, KC_BSRA, KC_IMEON,KC_ALT,  KC_LBRC, KC_RBRC, KC_GRV
 ),
-  /* Lower */
+/* Lower */
 [_LOWER] = LAYOUT(
     KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,
-    KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUOT,
+    KC_TAB,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUOT,
     _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, KC_LABK, KC_RABK, XXXXXXX, XXXXXXX,
     _______, _______, _______, _______, _______, _______, KC_DEL,  _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_TILD
 ),
@@ -89,11 +89,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   XXXXXXX, KC_PGUP, KC_UP,   KC_PGDN, XXXXXXX, XXXXXXX,
     _______, KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_HOME, KC_LEFT, KC_DOWN, KC_RIGHT,KC_END,  _______,
     _______, KC_F11,  KC_F12,  XXXXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-    _______, _______, _______, _______, _______, _______, KC_DEL,  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
+    _______, _______, _______, _______, _______, KC_MLAD, _______, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
 ),
 /* Adjust */
 [_ADJUST] = LAYOUT(
-    RESET,   _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+    RESET,   _______, _______, AG_NORM, AG_SWAP, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
@@ -106,57 +106,83 @@ static inline void _send_key(uint16_t keycode) {
 }
 
 static inline void _change_ime(bool enable) {
-    if (enable) {
-#ifdef _MAC
-        _send_key(KC_LANG1);
-#else
-        _send_key(KC_HENK);
-#endif
+  if (enable) {
+    if (_IS_MAC) {
+      _send_key(KC_LANG1);
     } else {
-#ifdef _MAC
-        _send_key(KC_LANG2);
-#else
-        _send_key(KC_MHEN);
-#endif
+      _send_key(KC_HENK);
     }
+  } else {
+    if (_IS_MAC) {
+         _send_key(KC_LANG2);
+    } else {
+        _send_key(KC_MHEN);
+    }
+  }
 }
 
-static bool lower_pressed = false;
-static bool raise_pressed = false;
-static uint16_t lower_pressed_time = 0;
-static uint16_t raise_pressed_time = 0;
-
-static inline void update_change_layer(bool pressed, uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  pressed ? layer_on(layer1) : layer_off(layer1);
-  IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2) ? layer_on(layer3) : layer_off(layer3);
+static inline void _send_ctrl_by_mode(bool to_register) {
+  if (to_register) {
+    if (_IS_MAC) {
+        register_code (KC_LGUI);
+    } else {
+        register_code (KC_LCTL);
+    }
+  } else {
+    if (_IS_MAC) {
+        unregister_code (KC_LGUI);
+    } else {
+        unregister_code (KC_LCTL);
+    }
+  }
 }
 
-static inline void set_lower_pressed(uint16_t time) {
-  lower_pressed = true;
-  raise_pressed = false;
-  lower_pressed_time = time;
+static inline void _send_win_by_mode(bool to_register) {
+  if (to_register) {
+    if (_IS_MAC) {
+        register_code (KC_LCTL);
+    } else {
+        register_code (KC_LGUI);
+    }
+  } else {
+    if (_IS_MAC) {
+        unregister_code (KC_LCTL);
+    } else {
+        unregister_code (KC_LGUI);
+    }
+  }
 }
 
-static inline void set_raise_pressed(uint16_t time) {
-  raise_pressed = true;
-  lower_pressed = false;
-  raise_pressed_time = time;
+void dance_cln_finished (qk_tap_dance_state_t *state, void *user_data) {
+  switch (state->keycode) {
+    case KC_CTTB:
+      if (state->count == 1) {
+        _send_ctrl_by_mode(true);
+      } else if (state->count == 2) {
+        register_code(KC_TAB);
+      }
+      break;
+  }
 }
 
-static inline void reset_layer_pressed(void) {
-  lower_pressed = false;
-  raise_pressed = false;
-  lower_pressed_time = 0;
-  raise_pressed_time = 0;
+void dance_cln_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (state->keycode) {
+    case KC_CTTB:
+      if (state->count == 1) {
+        _send_ctrl_by_mode(false);
+      } else if (state->count == 2) {
+        unregister_code(KC_TAB);
+      }
+      break;
+  }
 }
 
-static inline bool is_lower_pressed(uint16_t time) {
-  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_TERM);
-}
-
-static inline bool is_raise_pressed(uint16_t time) {
-  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_TERM);
-}
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
+  [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
+  [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
+  [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
+};
 
 void matrix_init_user(void) {
 }
@@ -169,34 +195,42 @@ void led_set_user(uint8_t usb_led) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    case LOWER:
+    case KC_IMEOF:
       if (record->event.pressed) {
-        set_lower_pressed(record->event.time);
-      } else {
-        if (is_lower_pressed(record->event.time)) {
-            _change_ime(false);
-        }
-        lower_pressed = false;
+        _change_ime(false);
       }
-      update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
       return false;
       break;
-    case RAISE:
+    case KC_IMEON:
       if (record->event.pressed) {
-        set_raise_pressed(record->event.time);
-      } else {
-        if (is_raise_pressed(record->event.time)) {
-            _change_ime(true);
-        }
-        raise_pressed = false;
+        _change_ime(true);
       }
-      update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
       return false;
+      break;
+    case KC_WIN:
+      if (record->event.pressed) {
+          _send_win_by_mode(true);
+      } else {
+          _send_win_by_mode(false);
+      }
+      return false;
+      break;
+    case KC_CTL:
+      if (record->event.pressed) {
+          _send_ctrl_by_mode(true);
+      } else {
+          _send_ctrl_by_mode(false);
+      }
+      return false;
+      break;
+    case KC_ALT:
+      if (record->event.pressed) {
+        register_code(KC_LALT);
+      } else {
+        unregister_code(KC_LALT);
+      }
       break;
     default:
-      if (record->event.pressed) {
-        reset_layer_pressed();
-      }
       break;
   }
   return true;
