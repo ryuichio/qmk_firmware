@@ -44,11 +44,14 @@ enum tapdances{
   TD_CTTB,
 };
 
+// macro key definitions
 #define XXXXXXX  KC_NO
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
 #define KC_MIEQ  TD(TD_MIEQ)
 #define KC_CTTB  TD(TD_CTTB)
+#define KC_ALTB  LALT(KC_TAB)
+#define KC_RATB  LSFT(LALT(KC_TAB))
 
 #define _IS_MAC   (keymap_config.swap_lalt_lgui == false)
 
@@ -75,11 +78,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_MIEQ,
     KC_CTTB, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCCL, KC_ENT,
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_BSLS,
-    KC_TAB,  KC_LCTL, KC_ALT,  KC_WIN,  KC_IMEOF,KC_SPLO, KC_BSRA, KC_IMEON,KC_ALT,  KC_LBRC, KC_RBRC, KC_GRV
+    XXXXXXX, KC_LCTL, KC_ALT,  KC_WIN,  KC_IMEOF,KC_SPLO, KC_BSRA, KC_IMEON,KC_ALT,  KC_ALTB, KC_RATB, KC_GRV
 ),
 /* Lower */
 [_LOWER] = LAYOUT(
-    KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,
+    _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,
     KC_TAB,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUOT,
     _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, KC_LABK, KC_RABK, XXXXXXX, XXXXXXX,
     _______, _______, _______, _______, _______, _______, KC_DEL,  _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_TILD
@@ -188,9 +191,43 @@ void matrix_init_user(void) {
 }
 
 void matrix_scan_user(void) {
+  uint8_t layer = biton32(layer_state);
+  switch (layer) {
+  case 0:
+    // LED 00
+    writePinHigh(B0);
+    writePinHigh(D5);
+    break;
+  case 1:
+    // LED 01
+    writePinHigh(B0);
+    writePinLow(D5);
+    break;
+  case 2:
+    // LED 10
+    writePinLow(B0);
+    writePinHigh(D5);
+    break;
+  case 3:
+    // LED 11
+    writePinLow(B0);
+    writePinLow(D5);
+    break;
+  }
 }
 
 void led_set_user(uint8_t usb_led) {
+}
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case KC_SPLO:
+      return TAPPING_LAYER_TERM;
+    case KC_BSRA:
+      return TAPPING_LAYER_TERM;
+    default:
+      return TAPPING_TERM;
+  }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -229,6 +266,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       } else {
         unregister_code(KC_LALT);
       }
+      return false;
       break;
     default:
       break;
