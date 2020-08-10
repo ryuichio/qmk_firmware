@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include <stdio.h>
 
 //
 // make slamd:default:avrdude
@@ -103,6 +104,48 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 )
 };
 
+#ifdef OLED_DRIVER_ENABLE
+void set_keylog(uint16_t keycode, keyrecord_t *record);
+const char *read_keylog(void);
+const char *read_keylogs(void);
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_180;
+}
+
+void oled_task_user(void) {
+    // Host Keyboard Layer Status
+    oled_write_P(PSTR("Layer: "), false);
+
+    switch (get_highest_layer(layer_state)) {
+        case _BASE:
+            oled_write_ln_P(PSTR("Default"), false);
+            break;
+        case _LOWER:
+            oled_write_ln_P(PSTR("Lower"), false);
+            break;
+        case _RAISE:
+            oled_write_ln_P(PSTR("Raise"), false);
+            break;
+        case _ADJUST:
+            oled_write_ln_P(PSTR("Adjust"), false);
+            break;
+        default:
+            oled_write_ln_P(PSTR("Undefined"), false);
+    }
+
+    oled_write_P(PSTR("Mode:  "), false);
+    if (_IS_MAC) {
+        oled_write_ln_P(PSTR("MAC"), false);
+    } else {
+        oled_write_ln_P(PSTR("WIN"), false);
+    }
+
+    oled_write_ln(read_keylog(), false);
+    oled_write_ln(read_keylogs(), false);
+}
+#endif
+
 static inline void _send_key(uint16_t keycode) {
     register_code(keycode);
     unregister_code(keycode);
@@ -187,38 +230,6 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
 };
 
-void matrix_init_user(void) {
-}
-
-void matrix_scan_user(void) {
-  uint8_t layer = biton32(layer_state);
-  switch (layer) {
-  case 0:
-    // LED 00
-    writePinHigh(B0);
-    writePinHigh(D5);
-    break;
-  case 1:
-    // LED 01
-    writePinHigh(B0);
-    writePinLow(D5);
-    break;
-  case 2:
-    // LED 10
-    writePinLow(B0);
-    writePinHigh(D5);
-    break;
-  case 3:
-    // LED 11
-    writePinLow(B0);
-    writePinLow(D5);
-    break;
-  }
-}
-
-void led_set_user(uint8_t usb_led) {
-}
-
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case KC_SPLO:
@@ -231,6 +242,12 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_DRIVER_ENABLE
+  if (record->event.pressed) {
+    set_keylog(keycode, record);
+  }
+#endif
+
   switch (keycode) {
     case KC_IMEOF:
       if (record->event.pressed) {
