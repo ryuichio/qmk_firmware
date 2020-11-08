@@ -7,7 +7,6 @@
 #ifdef SSD1306OLED
   #include "ssd1306.h"
 #endif
-#define TAPPING_LAYER_TERM 150 // Custom LT Tapping term
 
 //
 // make crkbd:mydef:avrdude
@@ -72,25 +71,23 @@ enum macro_keycodes {
 #define KC_SSPC  SP_SPC
 #define KC_SBS   SP_BS
 
+// Layer Mode aliases
+#define KC_MLAD  MO(_ADJUST)
+
 enum tapdances{
   TD_SCCL = 0,
   TD_SLBS,
   TD_MIEQ,
   TD_CTTB,
 };
-
-// Layer Mode aliases
-#define KC_MLAD  MO(_ADJUST)
-
-// Layer taps
-// #define KC_SPLO  LT(_LOWER, KC_SPC)
-// #define KC_BSRA  LT(_RAISE, KC_BSPC)
-
-// Tap dances
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
 #define KC_MIEQ  TD(TD_MIEQ)
 #define KC_CTTB  TD(TD_CTTB)
+
+// Layer taps
+// #define KC_SPLO  LT(_LOWER, KC_SPC)
+// #define KC_BSRA  LT(_RAISE, KC_BSPC)
 
 static inline void _send_ctrl_by_mode(bool to_register) {
   if (to_register) {
