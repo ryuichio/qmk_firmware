@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "slamd.h"
 
+uint32_t counter = 0;
 char keylog_str[24] = {};
 char keylogs_str[21] = {};
+char counter_str[16] = {};
 int keylogs_str_idx = 0;
 
 const char code_to_name[60] = {
@@ -14,6 +16,7 @@ const char code_to_name[60] = {
     ' ', ';', '\'', ' ', ',', '.', '/', ' ', ' ', ' '};
 
 void set_keylog(uint16_t keycode, keyrecord_t *record) {
+  counter++;
   char name = ' ';
   if (keycode < 60) {
     name = code_to_name[keycode];
@@ -23,6 +26,7 @@ void set_keylog(uint16_t keycode, keyrecord_t *record) {
   snprintf(keylog_str, sizeof(keylog_str), "%dx%d, k%2d : %c",
            record->event.key.row, record->event.key.col,
            keycode, name);
+  snprintf(counter_str, sizeof(counter_str), "%ld", counter);
 
   // update keylogs
   if (keylogs_str_idx == sizeof(keylogs_str) - 1) {
@@ -42,4 +46,8 @@ const char *read_keylog(void) {
 
 const char *read_keylogs(void) {
   return keylogs_str;
+}
+
+const char *read_counter(void) {
+  return counter_str;
 }

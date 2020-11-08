@@ -108,6 +108,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 void set_keylog(uint16_t keycode, keyrecord_t *record);
 const char *read_keylog(void);
 const char *read_keylogs(void);
+const char *read_counter(void);
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_180;
@@ -142,7 +143,8 @@ void oled_task_user(void) {
     }
 
     oled_write_ln(read_keylog(), false);
-    oled_write_ln(read_keylogs(), false);
+    //oled_write_ln(read_keylogs(), false);
+    oled_write_ln(read_counter(), false);
 }
 #endif
 
