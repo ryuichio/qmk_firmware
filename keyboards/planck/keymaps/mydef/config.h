@@ -37,3 +37,6 @@
 // Most tactile encoders have detents every 4 stages
 #define ENCODER_RESOLUTION 4
 
+#define IGNORE_MOD_TAP_INTERRUPT
+#define TAPPING_TERM 180
+#define TAPPING_LAYER_TERM 120 // Custom LT Tapping term
