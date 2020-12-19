@@ -7,7 +7,6 @@
 #ifdef SSD1306OLED
   #include "ssd1306.h"
 #endif
-#define TAPPING_LAYER_TERM 150 // Custom LT Tapping term
 
 //
 // make crkbd:mydef:avrdude
@@ -38,10 +37,9 @@ enum custom_keycodes {
   ADJUST,
   BACKLIT,
   RGBRST,
+  SP_CTL,
   SP_GUI,
   SP_ALT,
-  SP_SPC,
-  SP_BS,
 };
 
 enum macro_keycodes {
@@ -69,28 +67,23 @@ enum macro_keycodes {
 #define KC_SWAP  AG_SWAP
 #define KC_GUI   SP_GUI
 #define KC_ALT   SP_ALT
-#define KC_SSPC  SP_SPC
-#define KC_SBS   SP_BS
+#define KC_CTL   SP_CTL
 
 enum tapdances{
   TD_SCCL = 0,
   TD_SLBS,
   TD_MIEQ,
-  TD_CTTB,
 };
+#define KC_SCCL  TD(TD_SCCL)
+#define KC_SLBS  TD(TD_SLBS)
+#define KC_MIEQ  TD(TD_MIEQ)
 
 // Layer Mode aliases
 #define KC_MLAD  MO(_ADJUST)
 
 // Layer taps
-// #define KC_SPLO  LT(_LOWER, KC_SPC)
-// #define KC_BSRA  LT(_RAISE, KC_BSPC)
-
-// Tap dances
-#define KC_SCCL  TD(TD_SCCL)
-#define KC_SLBS  TD(TD_SLBS)
-#define KC_MIEQ  TD(TD_MIEQ)
-#define KC_CTTB  TD(TD_CTTB)
+#define KC_SPLO  LT(_LOWER, KC_SPC)
+#define KC_BSRA  LT(_RAISE, KC_BSPC)
 
 static inline void _send_ctrl_by_mode(bool to_register) {
   if (to_register) {
@@ -124,34 +117,10 @@ static inline void _send_win_by_mode(bool to_register) {
   }
 }
 
-void dance_cln_finished (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(true);
-      } else if (state->count == 2) {
-        register_code(KC_TAB);
-      }
-      break;
-  }
-}
-void dance_cln_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(false);
-      } else if (state->count == 2) {
-        unregister_code(KC_TAB);
-      }
-      break;
-  }
-}
-
 qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
   [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
   [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
-  [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -159,11 +128,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-----------------------------------------.                ,-----------------------------------------.
         ESC,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,  MIEQ,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-       CTTB,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCCL,   ENT,\
+        CTL,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCCL,   ENT,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLBS,   GRV,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  IMEOF,  SSPC,   ALT,      GUI,   SBS, IMEON\
+                                  IMEOF,  SPLO,   ALT,      GUI,  BSRA, IMEON\
                               //`--------------------'  `--------------------'
   ),
 
@@ -187,7 +156,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
       _____,   F11,   F12, XXXXX,  LCBR,  LBRC,                   RBRC,  RCBR, XXXXX, XXXXX, XXXXX, XXXXX,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  _____, _____, _____,    _____,  _____, _____\
+                                  _____,  MLAD, _____,    _____,  _____, _____\
                               //`--------------------'  `--------------------'
   ),
 
@@ -209,11 +178,6 @@ int RGB_current_mode;
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
   default_layer_set(default_layer);
-}
-
-static inline void update_change_layer(bool pressed, uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  pressed ? layer_on(layer1) : layer_off(layer1);
-  IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2) ? layer_on(layer3) : layer_off(layer3);
 }
 
 static inline void _send_key(uint16_t keycode) {
@@ -296,36 +260,27 @@ void iota_gfx_task_user(void) {
 }
 #endif//SSD1306OLED
 
-static bool lower_pressed = false;
-static bool raise_pressed = false;
-static uint16_t lower_pressed_time = 0;
-static uint16_t raise_pressed_time = 0;
+static bool ctrl_pressed = false;
+static uint16_t ctrl_pressed_time = 0;
 
-static inline void set_lower_pressed(uint16_t time) {
-  lower_pressed = true;
-  raise_pressed = false;
-  lower_pressed_time = time;
+static inline void set_ctrl_pressed(uint16_t time) {
+  ctrl_pressed = true;
+  ctrl_pressed_time = time;
 }
 
-static inline void set_raise_pressed(uint16_t time) {
-  raise_pressed = true;
-  lower_pressed = false;
-  raise_pressed_time = time;
+static inline bool is_ctrl_pressed(uint16_t time) {
+  return ctrl_pressed && (TIMER_DIFF_16(time, ctrl_pressed_time) < TAPPING_LAYER_TERM);
 }
 
-static inline void reset_layer_pressed(void) {
-  lower_pressed = false;
-  raise_pressed = false;
-  lower_pressed_time = 0;
-  raise_pressed_time = 0;
-}
-
-static inline bool is_lower_pressed(uint16_t time) {
-  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_LAYER_TERM);
-}
-
-static inline bool is_raise_pressed(uint16_t time) {
-  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_LAYER_TERM);
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case KC_SPLO:
+      return TAPPING_LAYER_TERM;
+    case KC_BSRA:
+      return TAPPING_LAYER_TERM;
+    default:
+      return TAPPING_TERM;
+  }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -355,28 +310,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
-    case SP_SPC:
+    case SP_CTL:
       if (record->event.pressed) {
-        set_lower_pressed(record->event.time);
+        _send_ctrl_by_mode(true);
+        set_ctrl_pressed(record->event.time);
       } else {
-        if (is_lower_pressed(record->event.time)) {
-          _send_key(KC_SPC);
+        _send_ctrl_by_mode(false);
+        if (is_ctrl_pressed(record->event.time)) {
+          _send_key(KC_TAB);
         }
-        lower_pressed = false;
+        ctrl_pressed = false;
       }
-      update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
-      return false;
-      break;
-    case SP_BS:
-      if (record->event.pressed) {
-        set_raise_pressed(record->event.time);
-      } else {
-        if (is_raise_pressed(record->event.time)) {
-          _send_key(KC_BSPC);
-        }
-        raise_pressed = false;
-      }
-      update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
       return false;
       break;
     case KC_ALT:
@@ -413,9 +357,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       #endif
       break;
     default:
-      if (record->event.pressed) {
-        reset_layer_pressed();
-      }
       break;
   }
   return true;

@@ -28,9 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define USE_SERIAL_PD2
 #define MASTER_LEFT             /* LEFT or RIGHT (or EE_HANDS) */
 
+#define RGBLIGHT_ANIMATIONS
 #define BACKLIGHT_NUM 22
 #define UNDERGLOW_NUM 6
 #define RGBLED_NUM (BACKLIGHT_NUM + UNDERGLOW_NUM)
+
 
 // #define CATERINA_BOOTLOADER /* Explicitly use caterina bootloader to make RESET keycode available */
 #define PREVENT_STUCK_MODIFIERS /* Auto-restore layer when the layer key is released */
@@ -46,6 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MOUSEKEY_WHEEL_TIME_TO_MAX 1
 
 #define TAPPING_TERM 180
+#define TAPPING_LAYER_TERM 120 // Custom LT Tapping term
 
 /* Prefer "hold" when "down -> up -> down" (recognized immediately as "tap twice" by default) */
 #define TAPPING_FORCE_HOLD
