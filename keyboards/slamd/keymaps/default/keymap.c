@@ -42,7 +42,6 @@ enum tapdances{
   TD_SCCL = 0,
   TD_SLBS,
   TD_MIEQ,
-  TD_CTTB,
 };
 
 // macro key definitions
@@ -50,7 +49,6 @@ enum tapdances{
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
 #define KC_MIEQ  TD(TD_MIEQ)
-#define KC_CTTB  TD(TD_CTTB)
 #define KC_ALTB  LALT(KC_TAB)
 #define KC_RATB  LSFT(LALT(KC_TAB))
 
@@ -77,14 +75,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 [_BASE] = LAYOUT(
     KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_MIEQ,
-    KC_CTTB, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCCL, KC_ENT,
+    KC_CTL,  KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCCL, KC_ENT,
     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_BSLS,
-    XXXXXXX, KC_LCTL, KC_ALT,  KC_WIN,  KC_IMEOF,KC_SPLO, KC_BSRA, KC_IMEON,KC_ALT,  KC_ALTB, KC_RATB, KC_GRV
+    XXXXXXX, KC_LCTL, KC_WIN,  KC_ALT,  KC_IMEOF,KC_SPLO, KC_BSRA, KC_IMEON,KC_ALT,  KC_ALTB, KC_RATB, KC_GRV
 ),
 /* Lower */
 [_LOWER] = LAYOUT(
     _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_EQL,
-    KC_TAB,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUOT,
+    _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUOT,
     _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, KC_LABK, KC_RABK, XXXXXXX, XXXXXXX,
     _______, _______, _______, _______, _______, _______, KC_DEL,  _______, XXXXXXX, XXXXXXX, XXXXXXX, KC_TILD
 ),
@@ -148,9 +146,21 @@ void oled_task_user(void) {
 }
 #endif
 
+static bool ctrl_pressed = false;
+static uint16_t ctrl_pressed_time = 0;
+
+static inline void set_ctrl_pressed(uint16_t time) {
+  ctrl_pressed = true;
+  ctrl_pressed_time = time;
+}
+
+static inline bool is_ctrl_pressed(uint16_t time) {
+  return ctrl_pressed && (TIMER_DIFF_16(time, ctrl_pressed_time) < TAPPING_LAYER_TERM);
+}
+
 static inline void _send_key(uint16_t keycode) {
-    register_code(keycode);
-    unregister_code(keycode);
+  register_code(keycode);
+  unregister_code(keycode);
 }
 
 static inline void _change_ime(bool enable) {
@@ -201,35 +211,10 @@ static inline void _send_win_by_mode(bool to_register) {
   }
 }
 
-void dance_cln_finished (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(true);
-      } else if (state->count == 2) {
-        register_code(KC_TAB);
-      }
-      break;
-  }
-}
-
-void dance_cln_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(false);
-      } else if (state->count == 2) {
-        unregister_code(KC_TAB);
-      }
-      break;
-  }
-}
-
 qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
   [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
   [TD_MIEQ] = ACTION_TAP_DANCE_DOUBLE(KC_MINS, KC_EQL),
-  [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
 };
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
@@ -273,9 +258,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       break;
     case KC_CTL:
       if (record->event.pressed) {
-          _send_ctrl_by_mode(true);
+        _send_ctrl_by_mode(true);
+        set_ctrl_pressed(record->event.time);
       } else {
-          _send_ctrl_by_mode(false);
+        _send_ctrl_by_mode(false);
+        if (is_ctrl_pressed(record->event.time)) {
+          _send_key(KC_TAB);
+        }
+        ctrl_pressed = false;
       }
       return false;
       break;
