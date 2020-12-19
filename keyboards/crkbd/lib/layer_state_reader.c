@@ -8,7 +8,7 @@
 #define L_LOWER 2
 #define L_RAISE 4
 #define L_ADJUST 8
-#define L_ADJUST_TRI 14
+#define L_ADJUST_TRI 12
 
 char layer_state_str[24];
 
