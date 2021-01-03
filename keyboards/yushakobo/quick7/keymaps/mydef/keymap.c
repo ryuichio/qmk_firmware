@@ -19,8 +19,10 @@
 
 // Defines names for use in layer keycodes and the keymap
 enum layer_names {
-    _BASE,
-    _FUNC1
+    _Arrow,  // arrows
+    _Audio,  // audio
+    _Led,    // leds
+    _System, // system
 };
 
 #define XXXXXXX  KC_NO
@@ -32,15 +34,25 @@ enum custom_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
-    [_BASE] = LAYOUT(
-        XXXXXXX,   XXXXXXX,   RGB_MOD,
-        MO(_FUNC1),KC_UP,     KC_TAB,
+    [_Arrow] = LAYOUT(
+        XXXXXXX,   XXXXXXX,   TO(_Audio),
+        KC_PGUP,   KC_UP,     KC_PGDN,
         KC_LEFT,   KC_DOWN,   KC_RGHT
     ),
-    [_FUNC1] = LAYOUT(
-        XXXXXXX,   XXXXXXX,   RGB_TOG,
-        _______,   KC_VOLU,   KC_END,
-        KC_MPRV,   KC_VOLD,   KC_MNXT
+    [_Audio] = LAYOUT(
+        XXXXXXX,   XXXXXXX,   TO(_Led),
+        KC_MUTE,   KC_VOLU,   KC_MPRV,
+        KC_MSTP,   KC_VOLD,   KC_MNXT
+    ),
+    [_Led] = LAYOUT(
+        XXXXXXX,   XXXXXXX,   TO(_System),
+        RGB_TOG,   RGB_SAI,   RGB_VAI,
+        RGB_MOD,   RGB_SAD,   RGB_VAD
+    ),
+    [_System] = LAYOUT(
+        XXXXXXX,   XXXXXXX,   TO(_Arrow),
+        RESET,     XXXXXXX,   XXXXXXX,
+        XXXXXXX,   XXXXXXX,   XXXXXXX
     )
 };
 
@@ -58,16 +70,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void encoder_update_user(uint8_t index, bool clockwise) {
-    // if (clockwise) {
-    //     tap_code(KC_VOLU);
-    // } else {
-    //     tap_code(KC_VOLD);
-    // }
-    if (clockwise) {
-        rgblight_decrease_hue_noeeprom();
+static inline void _send_key(uint16_t keycode) {
+    register_code(keycode);
+    unregister_code(keycode);
+}
+
+void _enc_tap(bool iscw, uint16_t oncw, uint16_t onucw) {
+    if (iscw) {
+        tap_code(oncw);
     } else {
-        rgblight_increase_hue_noeeprom();
+        tap_code(onucw);
+    }
+}
+
+void encoder_update_user(uint8_t index, bool clockwise) {
+    switch (get_highest_layer(layer_state)) {
+        case _Arrow:
+            break;
+        case _Audio:
+            _enc_tap(clockwise, KC_VOLU, KC_VOLD);
+            break;
+        case _Led:
+            if (clockwise) {
+                rgblight_decrease_hue_noeeprom();
+            } else {
+                rgblight_increase_hue_noeeprom();
+            }
+            break;
     }
 }
 
@@ -77,16 +106,37 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 void oled_task_user(void) {
     // Host Keyboard Layer Status
-    oled_write_P(PSTR("Layer: "), false);
+    oled_write_P(PSTR("Mode: "), false);
 
     switch (get_highest_layer(layer_state)) {
-        case _BASE:
-            oled_write_ln_P(PSTR("Base"), false);
+        case _Arrow:
+            oled_write_ln_P(PSTR("Arrow keys"), false);
+            oled_write_ln_P(PSTR("          ----/----"), false);
+            oled_write_ln_P(PSTR("PGUP  UP  PGDN"), false);
+            oled_write_ln_P(PSTR("LEFT DOWN RIGT"), false);
             break;
-        case _FUNC1:
-            oled_write_ln_P(PSTR("Func1"), false);
+        case _Audio:
+            oled_write_ln_P(PSTR("Audio"), false);
+            oled_write_ln_P(PSTR("          VOL+/VOL-"), false);
+            oled_write_ln_P(PSTR("MUTE VOL+ NEXT"), false);
+            oled_write_ln_P(PSTR("STOP VOL- PREV"), false);
+            break;
+        case _Led:
+            oled_write_ln_P(PSTR("LED Control"), false);
+            oled_write_ln_P(PSTR("          HUE+/HUE-"), false);
+            oled_write_ln_P(PSTR("TOGL SAT+ BRI+"), false);
+            oled_write_ln_P(PSTR("MODE SAT- BRI-"), false);
+            break;
+        case _System:
+            oled_write_ln_P(PSTR("System"), false);
+            oled_write_ln_P(PSTR("          ----/----"), false);
+            oled_write_ln_P(PSTR("RST  ---- ----"), false);
+            oled_write_ln_P(PSTR("---- ---- ----"), false);
             break;
         default:
             oled_write_ln_P(PSTR("Undefined"), false);
+            oled_write_ln_P(PSTR("          ----/----"), false);
+            oled_write_ln_P(PSTR("---- ---- ----"), false);
+            oled_write_ln_P(PSTR("---- ---- ----"), false);
     }
 }
