@@ -29,22 +29,15 @@ enum custom_keycodes {
   LOWER = SAFE_RANGE,
   RAISE,
   ADJUST,
-  KANJI,
   RGBRST,
   IMEOFF,
   IMEON,
+  SP_CTL,
   SP_GUI,
   SP_ALT,
-  SP_SPC,
-  SP_BS,
 };
 
-enum tapdances{
-  TD_SCCL = 0,
-  TD_SLBS,
-  TD_CTTB,
-};
-#define TAPPING_LAYER_TERM 150 // Custom LT Tapping term
+#define _IS_MAC   (keymap_config.swap_lalt_lgui == false)
 
 // Layer Mode aliases
 #define _____ KC_TRNS
@@ -52,20 +45,24 @@ enum tapdances{
 
 #define KC_IMEOF IMEOFF
 #define KC_IMEON IMEON
+#define KC_CTL   SP_CTL
 #define KC_GUI   SP_GUI
 #define KC_ALT   SP_ALT
-#define KC_SSPC  SP_SPC
-#define KC_SBS   SP_BS
-
 #define KC_TBSF  LSFT_T(KC_TAB)
-#define KC_ALAP  LALT_T(KC_APP)
-#define KC_JEQL  LSFT(KC_MINS)
 
+enum tapdances{
+  TD_SCCL = 0,
+  TD_SLBS,
+};
 #define KC_SCCL  TD(TD_SCCL)
 #define KC_SLBS  TD(TD_SLBS)
-#define KC_CTTB  TD(TD_CTTB)
 
-#define _IS_MAC   (keymap_config.swap_lalt_lgui == false)
+// Layer Mode aliases
+#define KC_MLAD  MO(_ADJUST)
+
+// Layer taps
+#define KC_SPLO  LT(_LOWER, KC_SPC)
+#define KC_BSRA  LT(_RAISE, KC_BSPC)
 
 static inline void _send_ctrl_by_mode(bool to_register) {
   if (to_register) {
@@ -99,33 +96,9 @@ static inline void _send_win_by_mode(bool to_register) {
   }
 }
 
-void dance_cln_finished (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(true);
-      } else if (state->count == 2) {
-        register_code(KC_TAB);
-      }
-      break;
-  }
-}
-void dance_cln_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (state->keycode) {
-    case KC_CTTB:
-      if (state->count == 1) {
-        _send_ctrl_by_mode(false);
-      } else if (state->count == 2) {
-        unregister_code(KC_TAB);
-      }
-      break;
-  }
-}
-
 qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_SCCL] = ACTION_TAP_DANCE_DOUBLE(KC_SCLN, KC_QUOT),
   [TD_SLBS] = ACTION_TAP_DANCE_DOUBLE(KC_SLSH, KC_BSLS),
-  [TD_CTTB] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_cln_finished, dance_cln_reset),
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -133,11 +106,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,--------------------------------------------------------------------------------------------------------------------.
        KC_ESC,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,           KC_EQL,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+-----------------|
-      KC_CTTB,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L, KC_SCCL,           KC_ENT,\
+       KC_CTL,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L, KC_SCCL,           KC_ENT,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLBS,   KC_UP,         \
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-      KC_TAB,   KC_ALT,  KC_GUI,KC_IMEOF,          KC_SSPC,           KC_SBS,KC_IMEON, KC_ALAP, KC_LEFT, KC_DOWN, KC_RGHT,\
+      KC_TAB,   KC_ALT,  KC_GUI,KC_IMEOF,          KC_SPLO,          KC_BSRA,KC_IMEON,  KC_APP, KC_LEFT, KC_DOWN, KC_RGHT,\
   //`-------------------------------------------------------------------------------------------------------------------'
     KC_MINS \
   // ExtraKey: Split backspace key or it is below the enter key.
@@ -149,7 +122,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+-----------------|
       KC_TBSF, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,            _____,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____,   XXXXX,   XXXXX,   XXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR,   XXXXX, KC_LBRC, KC_RBRC, KC_PGUP,        \
+        _____,   XXXXX,   XXXXX,   XXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR,   XXXXX,   XXXXX,   XXXXX, KC_PGUP,        \
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
         _____,   _____,   _____,   _____,            _____,           KC_DEL,   _____,   XXXXX, KC_HOME, KC_PGDN,  KC_END,\
   //`-------------------------------------------------------------------------------------------------------------------'
@@ -163,9 +136,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+-----------------|
       KC_TBSF,   KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10, KC_HOME, KC_LEFT, KC_DOWN, KC_RGHT,  KC_END,            _____,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____,  KC_F11,  KC_F12,   XXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR,   XXXXX,   XXXXX,   XXXXX, KC_PGUP,         \
+        _____,  KC_F11,  KC_F12,   XXXXX, KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR,   XXXXX,   XXXXX,   XXXXX, KC_MS_U,         \
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____,   _____,   _____,   _____,           _____,             _____,   _____,   XXXXX, KC_HOME, KC_PGDN,  KC_END,\
+        _____,   _____,   _____,   _____,          KC_MLAD,             _____,   _____,   XXXXX, KC_MS_L, KC_MS_D, KC_MS_R,\
   //`-------------------------------------------------------------------------------------------------------------------'
       XXXXX \
   // ExtraKey: Split backspace key or it is below the enter key.
@@ -177,9 +150,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+-----------------|
         XXXXX, RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI,   XXXXX,   XXXXX, KC_WH_R, KC_WH_D,  KC_END, KC_PGDN,            XXXXX,\
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____, RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD,   XXXXX,   XXXXX,   XXXXX, KC_BTN1, KC_BTN2,   XXXXX, KC_MS_U,         \
+        _____, RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD,   XXXXX,   XXXXX,   XXXXX, KC_BTN1, KC_BTN2,   XXXXX,   XXXXX,         \
   //|--------+--------+--------+--------+--------+--------|--------+--------+--------+--------+--------+--------+--------|
-        _____,   _____,   _____,   _____,            XXXXX,            XXXXX,   _____,   XXXXX, KC_MS_L, KC_MS_D, KC_MS_R,\
+        _____,   _____,   _____,   _____,            XXXXX,            XXXXX,   _____,   XXXXX,   XXXXX,   XXXXX,   XXXXX,\
   //`-------------------------------------------------------------------------------------------------------------------'
       XXXXX \
   // ExtraKey: Split backspace key or it is below the enter key.
@@ -272,25 +245,19 @@ void oled_task_user(void) {
 
 #endif
 
-static inline void update_change_layer(bool pressed, uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  pressed ? layer_on(layer1) : layer_off(layer1);
-  IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2) ? layer_on(layer3) : layer_off(layer3);
-  UPDATE_KEYMAP_STATUS();
-}
-
 static inline void _send_key(uint16_t keycode) {
     register_code(keycode);
     unregister_code(keycode);
 }
 
 static inline void _change_ime(bool enable) {
-    if (keymap_config.swap_lalt_lgui == false) {  // mac
+    if (_IS_MAC) {
         if (enable) {
             _send_key(KC_LANG1);
         } else {
             _send_key(KC_LANG2);
         }
-    } else {  // win
+    } else {
         if (enable) {
             _send_key(KC_HENK);
         } else {
@@ -300,40 +267,28 @@ static inline void _change_ime(bool enable) {
 }
 
 int RGB_current_mode;
-static bool lower_pressed = false;
-static bool raise_pressed = false;
-static uint16_t lower_pressed_time = 0;
-static uint16_t raise_pressed_time = 0;
-
-static inline void set_lower_pressed(uint16_t time) {
-  lower_pressed = true;
-  raise_pressed = false;
-  lower_pressed_time = time;
+static bool ctrl_pressed = false;
+static uint16_t ctrl_pressed_time = 0;
+static inline void set_ctrl_pressed(uint16_t time) {
+  ctrl_pressed = true;
+  ctrl_pressed_time = time;
+}
+static inline bool is_ctrl_pressed(uint16_t time) {
+  return ctrl_pressed && (TIMER_DIFF_16(time, ctrl_pressed_time) < TAPPING_LAYER_TERM);
 }
 
-static inline void set_raise_pressed(uint16_t time) {
-  raise_pressed = true;
-  lower_pressed = false;
-  raise_pressed_time = time;
-}
-
-static inline void reset_layer_pressed(void) {
-  lower_pressed = false;
-  raise_pressed = false;
-  lower_pressed_time = 0;
-  raise_pressed_time = 0;
-}
-
-static inline bool is_lower_pressed(uint16_t time) {
-  return lower_pressed && (TIMER_DIFF_16(time, lower_pressed_time) < TAPPING_LAYER_TERM);
-}
-
-static inline bool is_raise_pressed(uint16_t time) {
-  return raise_pressed && (TIMER_DIFF_16(time, raise_pressed_time) < TAPPING_LAYER_TERM);
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case KC_SPLO:
+      return TAPPING_LAYER_TERM;
+    case KC_BSRA:
+      return TAPPING_LAYER_TERM;
+    default:
+      return TAPPING_TERM;
+  }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-
   UPDATE_KEY_STATUS(keycode, record);
 
   bool result = false;
@@ -350,28 +305,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
-    case SP_SPC:
+    case SP_CTL:
       if (record->event.pressed) {
-        set_lower_pressed(record->event.time);
+        _send_ctrl_by_mode(true);
+        set_ctrl_pressed(record->event.time);
       } else {
-        if (is_lower_pressed(record->event.time)) {
-          _send_key(KC_SPC);
+        _send_ctrl_by_mode(false);
+        if (is_ctrl_pressed(record->event.time)) {
+          _send_key(KC_TAB);
         }
-        lower_pressed = false;
+        ctrl_pressed = false;
       }
-      update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
-      return false;
-      break;
-    case SP_BS:
-      if (record->event.pressed) {
-        set_raise_pressed(record->event.time);
-      } else {
-        if (is_raise_pressed(record->event.time)) {
-          _send_key(KC_BSPC);
-        }
-        raise_pressed = false;
-      }
-      update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
       return false;
       break;
     case KC_ALT:
@@ -405,10 +349,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     #endif
     default:
-      if (record->event.pressed) {
-        lower_pressed = false;
-        raise_pressed = false;
-      }
       result = true;
       break;
   }

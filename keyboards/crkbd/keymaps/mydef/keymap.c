@@ -65,9 +65,9 @@ enum macro_keycodes {
 
 #define KC_NORM  AG_NORM
 #define KC_SWAP  AG_SWAP
+#define KC_CTL   SP_CTL
 #define KC_GUI   SP_GUI
 #define KC_ALT   SP_ALT
-#define KC_CTL   SP_CTL
 
 enum tapdances{
   TD_SCCL = 0,
@@ -262,7 +262,6 @@ void iota_gfx_task_user(void) {
 
 static bool ctrl_pressed = false;
 static uint16_t ctrl_pressed_time = 0;
-
 static inline void set_ctrl_pressed(uint16_t time) {
   ctrl_pressed = true;
   ctrl_pressed_time = time;

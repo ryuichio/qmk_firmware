@@ -21,7 +21,8 @@
 #ifdef TAPPING_TERM
 #undef TAPPING_TERM
 #endif
-#define TAPPING_TERM 225
+#define TAPPING_TERM 180
+#define TAPPING_LAYER_TERM 120 // Custom LT Tapping term
 
 #ifdef MOUSEKEY_ENABLE
   #undef MOUSEKEY_INTERVAL
