@@ -4,7 +4,7 @@
 //
 // make treadstone32/lite:mydef:avrdude
 //
-//#define _MAC
+#define _MAC
 
 #ifdef RGBLIGHT_ENABLE
 //Following line allows macro to read current RGB settings
@@ -26,7 +26,6 @@ enum custom_keycodes {
   RGBRST = SAFE_RANGE,
   LOWER,
   RAISE,
-  KANJI,
 };
 
 enum tapdances{
@@ -158,19 +157,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   bool result = false;
   switch (keycode) {
-    case KANJI:
-      if (record->event.pressed) {
-        #ifdef _MAC
-          register_code(KC_LANG2);
-        #else
-          SEND_STRING(SS_LALT("`"));
-        #endif
-      } else {
-        #ifdef _MAC
-            unregister_code(KC_LANG2);
-        #endif
-      }
-      break;
     #ifdef RGBLIGHT_ENABLE
       //led operations - RGB mode change now updates the RGB_current_mode to allow the right RGB mode to be set after reactive keys are released
       case RGB_MOD:
