@@ -29,7 +29,8 @@ enum layer_names {
 
 // Defines the keycodes used by our macros in process_record_user
 enum custom_keycodes {
-    YUSHAURL = SAFE_RANGE
+    YUSHAURL = SAFE_RANGE,
+    KC_MCMUTE,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -42,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_Audio] = LAYOUT(
         XXXXXXX,   XXXXXXX,   TO(_Led),
         KC_MUTE,   KC_VOLU,   KC_MPRV,
-        KC_MSTP,   KC_VOLD,   KC_MNXT
+        KC_MCMUTE, KC_VOLD,   KC_MNXT
     ),
     [_Led] = LAYOUT(
         XXXXXXX,   XXXXXXX,   TO(_System),
@@ -65,6 +66,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
                 // when keycode QMKURL is released
             }
+            break;
+        case KC_MCMUTE:
+            if (record->event.pressed) {
+                register_code(KC_LSHIFT);
+                register_code(KC_LGUI);
+                register_code(KC_0);
+                unregister_code(KC_0);
+                unregister_code(KC_LGUI);
+                unregister_code(KC_LSHIFT);
+            }
+            return false;
             break;
     }
     return true;
@@ -119,7 +131,7 @@ void oled_task_user(void) {
             oled_write_ln_P(PSTR("Audio"), false);
             oled_write_ln_P(PSTR("          VOL+/VOL-"), false);
             oled_write_ln_P(PSTR("MUTE VOL+ NEXT"), false);
-            oled_write_ln_P(PSTR("STOP VOL- PREV"), false);
+            oled_write_ln_P(PSTR("MIC  VOL- PREV"), false);
             break;
         case _Led:
             oled_write_ln_P(PSTR("LED Control"), false);
